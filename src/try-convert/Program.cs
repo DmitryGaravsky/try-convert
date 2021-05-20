@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 using MSBuild.Abstractions;
 using MSBuild.Conversion.Project;
 using MSBuild.Conversion.SDK;
+using MSBuild.Conversion.Facts;
 
 namespace MSBuild.Conversion
 {
@@ -40,12 +42,13 @@ namespace MSBuild.Conversion
                 .AddOption(new Option(new[] { "--diff-only" }, "Produces a diff of the project to convert; no conversion is done") { Argument = new Argument<bool>(() => false) })
                 .AddOption(new Option(new[] { "--no-backup" }, "Converts projects, does not create a backup of the originals and removes packages.config file.") { Argument = new Argument<bool>(() => false) })
                 .AddOption(new Option(new[] { "--keep-current-tfms" }, "Converts project files but does not change any TFMs. If unspecified, TFMs may change.") { Argument = new Argument<bool>(() => false) })
+                .AddOption(new Option(new[] { "-g", "--generate-dependencies-version" }, "Create dependencies with specified major version") { Argument = new Argument<decimal?>(() => null) })
                 .Build();
 
             return await parser.InvokeAsync(args).ConfigureAwait(false);
         }
 
-        public static int Run(string? project, string? workspace, string? msbuildPath, string? tfm, bool forceWebConversion, bool preview, bool diffOnly, bool noBackup, bool keepCurrentTfms)
+        public static int Run(string? project, string? workspace, string? msbuildPath, string? tfm, bool forceWebConversion, bool preview, bool diffOnly, bool noBackup, bool keepCurrentTfms, decimal? generateDependenciesVersion)
         {
             if (!string.IsNullOrWhiteSpace(project) && !string.IsNullOrWhiteSpace(workspace))
             {
@@ -61,6 +64,12 @@ namespace MSBuild.Conversion
 
             try
             {
+                if (generateDependenciesVersion != null) {
+                    Console.WriteLine($"Generating dependencies for {generateDependenciesVersion} version");
+                    DependenciesGenerator.Generate(generateDependenciesVersion.Value);
+                    return 0;
+                }
+
                 msbuildPath = MSBuildHelpers.HookAssemblyResolveForMSBuild(msbuildPath);
                 if (string.IsNullOrWhiteSpace(msbuildPath))
                 {

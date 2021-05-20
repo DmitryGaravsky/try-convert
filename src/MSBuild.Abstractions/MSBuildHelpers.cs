@@ -192,7 +192,7 @@ namespace MSBuild.Abstractions
             }
             else
             {
-                return DesktopFacts.KnownWinFormsReferences.Any(reference => references.Contains(reference, StringComparer.OrdinalIgnoreCase));
+                return DesktopFacts.KnownWinFormsReferences.Any(reference => references.Contains(reference, StringComparer.OrdinalIgnoreCase)) || references.Any(x => DevExpressFacts.IsDevExpressWpf(x));
             }
         }
 

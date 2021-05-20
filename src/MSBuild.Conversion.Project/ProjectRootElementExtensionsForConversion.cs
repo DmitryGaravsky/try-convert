@@ -175,7 +175,8 @@ namespace MSBuild.Conversion.Project
                         string? version = null;
                         try
                         {
-                            version = NugetHelpers.GetLatestVersionForPackageNameAsync(packageName).GetAwaiter().GetResult();
+                            if(!DevExpressFacts.SkipNetwork(packageName))
+                                version = NugetHelpers.GetLatestVersionForPackageNameAsync(packageName).GetAwaiter().GetResult();
                         }
                         catch (Exception)
                         {
@@ -185,7 +186,10 @@ namespace MSBuild.Conversion.Project
                         if (version is null)
                         {
                             // fall back to hard-coded version in the event of a network failure
-                            version = MSBuildFacts.DefaultItemsThatHavePackageEquivalents[packageName];
+                            MSBuildFacts.DefaultItemsThatHavePackageEquivalents.TryGetValue(packageName, out version);
+                        }
+                        if (version is null) {
+                            version = DevExpressFacts.GetPackageVersion(item.Include);
                         }
 
                         projectRootElement.AddPackage(packageName, version);
@@ -383,6 +387,8 @@ namespace MSBuild.Conversion.Project
 
         private static void AddPackageReferenceElement(ProjectItemGroupElement packageReferencesItemGroup, string packageName, string? packageVersion)
         {
+            if (packageReferencesItemGroup.Children.OfType<ProjectItemElement>().Any(x => string.Equals(x.Include, packageName, StringComparison.OrdinalIgnoreCase)))
+                return;
             var packageReference = packageReferencesItemGroup.AddItem(PackageFacts.PackageReferenceItemType, packageName);
             packageReference.GetXml().SetAttribute(PackageFacts.VersionAttribute, packageVersion);
         }

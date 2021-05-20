@@ -48,7 +48,7 @@ namespace MSBuild.Abstractions
         /// Checks if a given item is a well-known reference that can be converted to PackageReference.
         /// </summary>
         public static bool IsReferenceConvertibleToPackageReference(ProjectItemElement item) =>
-            MSBuildFacts.DefaultItemsThatHavePackageEquivalents.ContainsKey(item.Include);
+            MSBuildFacts.DefaultItemsThatHavePackageEquivalents.ContainsKey(item.Include) || DevExpressFacts.IsReferenceConvertibleToPackageReference(item.Include);
 
         /// <summary>
         /// Checks if a reference is coming from an old-stlye NuGet package.

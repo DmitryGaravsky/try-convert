@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MSBuild.Conversion.Facts;
 
 namespace MSBuild.Abstractions
 {
@@ -46,10 +47,13 @@ namespace MSBuild.Abstractions
 
         public static string FindPackageNameFromReferenceName(string referenceName)
         {
-            if (StringComparer.OrdinalIgnoreCase.Compare(referenceName, "System.ComponentModel.DataAnnotations")==0)
+            if (StringComparer.OrdinalIgnoreCase.Compare(referenceName, "System.ComponentModel.DataAnnotations") == 0)
             {
                 return "System.ComponentModel.Annotations";
             }
+            var devExpressPackageName = DevExpressFacts.FindPackageNameFromReferenceName(referenceName);
+            if (devExpressPackageName != null)
+                return devExpressPackageName;
 
             return referenceName;
         }
