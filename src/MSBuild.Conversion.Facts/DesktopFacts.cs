@@ -48,6 +48,7 @@ namespace MSBuild.Conversion.Facts
 
         public static ImmutableArray<Guid> KnownSupportedDesktopProjectTypeGuids => ImmutableArray.Create(
             Guid.Parse("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"), // C#
+            Guid.Parse("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"), // VB.NET
             Guid.Parse("{60DC8134-EBA5-43B8-BCC9-BB4BC16C2548}") // WPF
         );
 

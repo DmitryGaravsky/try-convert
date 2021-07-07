@@ -244,8 +244,8 @@ namespace MSBuild.Conversion.Facts
 
         public static ImmutableArray<Guid> LanguageProjectTypeGuids => ImmutableArray.Create(
             Guid.Parse("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"), // C#
-            Guid.Parse("{F2A71F9B-5D33-465A-A702-920D77279786}"), // VB.NET
-            Guid.Parse("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") // F#
+            Guid.Parse("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"), // VB.NET
+            Guid.Parse("{F2A71F9B-5D33-465A-A702-920D77279786}")  // F#
         );
 
         public const string DefaultSDKAttribute = "Microsoft.NET.Sdk";
