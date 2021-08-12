@@ -15,7 +15,8 @@ namespace MSBuild.Conversion.Facts
     public static class DevExpressFacts
     {
         static Dictionary<string, Dictionary<string, string>> versionToReferences;
-        public static string MajorVersion = ".v20.2";
+        public const string MajorVersion = ".v20.2";
+        public const string PublicAndPrereleasePackageMaskSuffix = ".*-*";
         public static bool SkipNetwork(string packageName)
         {
             return IsDevExpress(packageName);
@@ -61,9 +62,9 @@ namespace MSBuild.Conversion.Facts
                 return null;
             var version = DependenciesGenerator.GetVersion(includeString);
             if (version == null)
-                return "21.1.*";
+                return "21.1" + PublicAndPrereleasePackageMaskSuffix;
             //var referenceName = DependenciesGenerator.GetReferenceName(includeString);
-            return version + ".*";
+            return version + PublicAndPrereleasePackageMaskSuffix;
         }
         public static bool IsDevExpress(string name) {
             return name.StartsWith(DevExpressPrefix, StringComparison.InvariantCultureIgnoreCase);
@@ -74,12 +75,13 @@ namespace MSBuild.Conversion.Facts
         }
         static Dictionary<string, string> CreateReferenceToPackage(string version)
         {
-            var references = new Dictionary<string, string>();
+            var references = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var package in DependenciesGenerator.GetReferences(version)) {
                 foreach (var reference in package.Item2) {
                     references.Add(reference, package.Item1.PackageName);
                 }
             }
+            references.Add("DevExpress.Xpf.Mvvm.v" + version, "DevExpress.Mvvm");
             return references;
         }
     }
@@ -94,8 +96,9 @@ namespace MSBuild.Conversion.Facts
         {
             return Directory
                         .GetFiles(string.Format(LocalPackagesStorage, packageMajorVersion))
+                        .Where(x => Path.GetExtension(x) == NugetPackageExtension)
                         .GroupBy(x => GetPackageNameWithoutVersion(Path.GetFileNameWithoutExtension(x)))
-                        .Select(x => new PackageInfo(x.OrderBy(y => GetPackageMinorVersion(y)).Last(), x.Key));
+                        .Select(x => new PackageInfo(x.OrderBy(y => GetPackageMinorVersion(Path.GetFileNameWithoutExtension(y))).Last(), x.Key));
         }
         //static IEnumerable<string> ExtractPackageReferences(PackageInfo[] packagesStorage, string referencedPackageName, HashSet<string> viewedPackages)
         //{
@@ -198,6 +201,8 @@ namespace MSBuild.Conversion.Facts
         public const string ReferencePathAttribute = "HintPath";
         public const string LocalReferenceStorage = @"C:\Work\20{0}\Bin\NETCoreDesktop";
 
+        
+        public const string NugetPackageExtension = ".nupkg";
         public const string NuspecExtension = ".nuspec";
         public const string NuspecXsdNamespace = "n";
         public const string NuspecXsdUri = "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd";

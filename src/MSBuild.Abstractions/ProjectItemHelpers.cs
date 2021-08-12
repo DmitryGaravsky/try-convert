@@ -32,7 +32,8 @@ namespace MSBuild.Abstractions
             DesktopFacts.ReferencesThatNeedRemoval.Contains(item.Include, StringComparer.OrdinalIgnoreCase)
             || DesktopFacts.KnownWPFReferences.Contains(item.Include, StringComparer.OrdinalIgnoreCase)
             || DesktopFacts.KnownWinFormsReferences.Contains(item.Include, StringComparer.OrdinalIgnoreCase)
-            || DesktopFacts.KnownDesktopReferences.Contains(item.Include, StringComparer.OrdinalIgnoreCase);
+            || DesktopFacts.KnownDesktopReferences.Contains(item.Include, StringComparer.OrdinalIgnoreCase)
+            || DesktopFacts.KnownSDKReferences.Contains(item.Include, StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Checks if a given item is a desktop item that is globbed, so long as the metadata is a form type.

@@ -153,6 +153,8 @@ namespace MSBuild.Conversion.Project
 
                 foreach (var item in itemGroup.Items.Where(item => !ProjectItemHelpers.IsPackageReference(item)))
                 {
+                    if (item.ElementName == "Import")
+                        continue;
                     if (item.HasMetadata && ProjectItemHelpers.CanItemMetadataBeRemoved(item))
                     {
                         foreach (var metadataElement in item.Metadata.Where(x => x.ElementName != "Aliases"))
@@ -413,6 +415,7 @@ namespace MSBuild.Conversion.Project
                 && MSBuildHelpers.IsWPF(projectRootElement))
             {
                 MSBuildHelpers.AddUseWPF(propGroup);
+                MSBuildHelpers.AddPlatforms(propGroup);
             }
 
             return projectRootElement;

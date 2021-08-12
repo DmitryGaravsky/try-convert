@@ -36,20 +36,27 @@ namespace MSBuild.Conversion.Project
                 }
 
                 var newEvaluatedProp = _project2.GetProperty(propInFile);
-                if (newEvaluatedProp is { })
+                if (newEvaluatedProp == null)
                 {
-                    if (!originalEvaluatedProp.EvaluatedValue.Equals(newEvaluatedProp.EvaluatedValue, StringComparison.OrdinalIgnoreCase))
-                    {
-                        changedProps.Add((originalEvaluatedProp, newEvaluatedProp));
-                    }
-                    else
-                    {
-                        defaultedProps.Add(newEvaluatedProp);
-                    }
+                    defaultedProps.Add(originalEvaluatedProp);
                 }
                 else
                 {
-                    notDefaultedProps.Add(originalEvaluatedProp);
+                    if (newEvaluatedProp is { })
+                    {
+                        if (!originalEvaluatedProp.EvaluatedValue.Equals(newEvaluatedProp.EvaluatedValue, StringComparison.OrdinalIgnoreCase))
+                        {
+                            changedProps.Add((originalEvaluatedProp, newEvaluatedProp));
+                        }
+                        else
+                        {
+                            defaultedProps.Add(newEvaluatedProp);
+                        }
+                    }
+                    else
+                    {
+                        notDefaultedProps.Add(originalEvaluatedProp);
+                    }
                 }
             }
 

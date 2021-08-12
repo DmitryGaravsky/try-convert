@@ -280,6 +280,7 @@ namespace MSBuild.Abstractions
         /// Adds the UseWPF=true property to the top-level project property group.
         /// </summary>
         public static void AddUseWPF(ProjectPropertyGroupElement propGroup) => propGroup.AddProperty(DesktopFacts.UseWPFPropertyName, "true");
+        public static void AddPlatforms(ProjectPropertyGroupElement propGroup) => propGroup.AddProperty(DesktopFacts.PlatformsPropertyName, "x86;AnyCPU");
 
         /// <summary>
         /// Finds the property group with the TFM specified, which is normally the top-level property group.
