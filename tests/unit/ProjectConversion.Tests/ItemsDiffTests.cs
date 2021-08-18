@@ -82,7 +82,7 @@ namespace MSBuild.Abstractions.Tests
             var removedItems = IProjectFactory.Create(GetItems("A:D,E")).Items.ToImmutableArray();
             var introducedItems = IProjectFactory.Create(GetItems("A:F,G")).Items.ToImmutableArray();
             var changedItems = ImmutableArray<IProjectItem>.Empty;
-            var diff = new ItemsDiff("A", defaultedItems, removedItems, introducedItems, changedItems);
+            var diff = new ItemsDiff("A", defaultedItems, removedItems, introducedItems, changedItems, ImmutableArray<IProjectItem>.Empty);
 
             var lines = diff.GetDiffLines();
             var expectedLines = new[]
@@ -107,7 +107,7 @@ namespace MSBuild.Abstractions.Tests
             var removedItems = ImmutableArray<IProjectItem>.Empty;
             var introducedItems = ImmutableArray<IProjectItem>.Empty;
             var changedItems = ImmutableArray<IProjectItem>.Empty;
-            var diff = new ItemsDiff("X", defaultedItems, removedItems, introducedItems, changedItems);
+            var diff = new ItemsDiff("X", defaultedItems, removedItems, introducedItems, changedItems, ImmutableArray<IProjectItem>.Empty);
 
             var lines = diff.GetDiffLines();
             var expectedLines = new[]

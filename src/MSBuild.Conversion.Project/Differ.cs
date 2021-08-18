@@ -81,19 +81,37 @@ namespace MSBuild.Conversion.Project
                                      };
 
             var builder = ImmutableArray.CreateBuilder<ItemsDiff>();
-
+            var newKeys = newItemGroups.Select(x => x.Key).ToHashSet();
+            var absentGroups = from og in oldItemGroups
+                               where !newKeys.Contains(og.Key, StringComparer.OrdinalIgnoreCase)
+                               select og;
+            var emptyArray = ImmutableArray<IProjectItem>.Empty;
             foreach (var group in addedRemovedGroups)
             {
                 var defaultedItems = group.DefaultedItems.ToImmutableArray();
                 var notDefaultedItems = group.NotDefaultedItems.ToImmutableArray();
-                var introducedItems = group.IntroducedItems.ToImmutableArray();
+                var introducedItems = GetIntroducedItems(group.ItemType, group.IntroducedItems, absentGroups).ToImmutableArray();
                 var changedItems = group.ChangedItems.ToImmutableArray();
 
-                var diff = new ItemsDiff(group.ItemType, defaultedItems, notDefaultedItems, introducedItems, changedItems);
+                var diff = new ItemsDiff(group.ItemType, defaultedItems, notDefaultedItems, introducedItems, changedItems, emptyArray);
                 builder.Add(diff);
+            }
+            
+
+            foreach (var group in absentGroups) {
+                builder.Add(new ItemsDiff(group.Key, emptyArray, emptyArray, emptyArray, emptyArray, group.ToImmutableArray()));
             }
 
             return builder.ToImmutable();
+        }
+        IEnumerable<IProjectItem> GetIntroducedItems(string itemType, IEnumerable<IProjectItem> introducedItems, IEnumerable<IGrouping<string, IProjectItem>> absentGroups)
+        {
+            if (string.Equals(itemType, "Page", StringComparison.OrdinalIgnoreCase))
+            {
+                var absentApplicationDefininions = absentGroups.Where(x => string.Equals(x.Key, "ApplicationDefinition")).SelectMany(x => x).Select(x => x.EvaluatedInclude).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                return introducedItems.Where(x => !absentApplicationDefininions.Contains(x.EvaluatedInclude));
+            }
+            return introducedItems;
         }
 
         private IEnumerable<IProjectItem> GetChangedItems(IGrouping<string, IProjectItem> oldGroup, IGrouping<string, IProjectItem> newGroup)

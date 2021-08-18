@@ -12,21 +12,23 @@ namespace MSBuild.Conversion.Project
         public readonly ImmutableArray<IProjectItem> NotDefaultedItems;
         public readonly ImmutableArray<IProjectItem> IntroducedItems;
         public readonly ImmutableArray<IProjectItem> ChangedItems;
+        public readonly ImmutableArray<IProjectItem> AbsentItems;
 
-        public ItemsDiff(string itemType, ImmutableArray<IProjectItem> defaultedItems, ImmutableArray<IProjectItem> notDefaultedItems, ImmutableArray<IProjectItem> introducedItems, ImmutableArray<IProjectItem> changedItems) : this()
+        public ItemsDiff(string itemType, ImmutableArray<IProjectItem> defaultedItems, ImmutableArray<IProjectItem> notDefaultedItems, ImmutableArray<IProjectItem> introducedItems, ImmutableArray<IProjectItem> changedItems, ImmutableArray<IProjectItem> absentItems) : this()
         {
             ItemType = itemType;
             DefaultedItems = defaultedItems;
             NotDefaultedItems = notDefaultedItems;
             IntroducedItems = introducedItems;
             ChangedItems = changedItems;
+            AbsentItems = absentItems;
         }
 
         public ImmutableArray<string> GetDiffLines()
         {
             var lines = ImmutableArray.CreateBuilder<string>();
 
-            if (!DefaultedItems.IsEmpty || !NotDefaultedItems.IsEmpty || !IntroducedItems.IsEmpty || !ChangedItems.IsEmpty)
+            if (!DefaultedItems.IsEmpty || !NotDefaultedItems.IsEmpty || !IntroducedItems.IsEmpty || !ChangedItems.IsEmpty || !AbsentItems.IsEmpty)
             {
                 lines.Add($"{ ItemType} items:");
                 if (!DefaultedItems.IsEmpty)
@@ -42,6 +44,10 @@ namespace MSBuild.Conversion.Project
                 if (!IntroducedItems.IsEmpty)
                 {
                     lines.AddRange(IntroducedItems.Select(s => $"+ {s.EvaluatedInclude}"));
+                }
+                if (!AbsentItems.IsEmpty)
+                {
+                    lines.AddRange(AbsentItems.Select(s => $"+ {s.EvaluatedInclude}"));
                 }
 
                 lines.Add("");

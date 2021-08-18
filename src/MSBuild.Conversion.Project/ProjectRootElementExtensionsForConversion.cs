@@ -12,6 +12,7 @@ namespace MSBuild.Conversion.Project
 {
     public static class ProjectRootElementExtensionsForConversion
     {
+        const string ApplicationDefinitionItemType = "ApplicationDefinition";
         public static IProjectRootElement ChangeImportsAndAddSdkAttribute(this IProjectRootElement projectRootElement, BaselineProject baselineProject)
         {
             foreach (var import in projectRootElement.Imports)
@@ -244,16 +245,31 @@ namespace MSBuild.Conversion.Project
                     var changedItems = itemTypeDiff.ChangedItems.Select(i => i.EvaluatedInclude);
                     if (changedItems.Contains(item.Include, StringComparer.OrdinalIgnoreCase))
                     {
-                        var path = item.Include;
-                        item.Include = null;
-                        item.Update = path;
+                        if (item.ItemType == ApplicationDefinitionItemType)
+                        {
+                            itemGroup.RemoveChild(item);
+                        }
+                        else
+                        {
+                            var path = item.Include;
+                            item.Include = null;
+                            item.Update = path;
+                        }
+                    }
+                }
+                if (!itemTypeDiff.AbsentItems.IsDefaultOrEmpty)
+                {
+                    var absentItems = itemTypeDiff.AbsentItems.Select(i => i.EvaluatedInclude);
+                    if (absentItems.Contains(item.Include, StringComparer.OrdinalIgnoreCase) && item.ItemType == ApplicationDefinitionItemType)
+                    {
+                        item.RemoveAllChildren();
                     }
                 }
             }
 
             static bool IsDesktopRemovableItem(BaselineProject sdkBaselineProject, ProjectItemGroupElement itemGroup, ProjectItemElement item)
             {
-                return sdkBaselineProject.ProjectStyle == ProjectStyle.WindowsDesktop
+                return item.ElementName != ApplicationDefinitionItemType && sdkBaselineProject.ProjectStyle == ProjectStyle.WindowsDesktop
                        && (ProjectItemHelpers.IsLegacyXamlDesignerItem(item)
                            || ProjectItemHelpers.IsDependentUponXamlDesignerItem(item)
                            || ProjectItemHelpers.IsDesignerFile(item)

@@ -97,7 +97,8 @@ namespace MSBuild.Abstractions
         /// <param name="item">The ProjectItemElement that might be a designer file.</param>
         /// <returns>true if the given ProjectItemElement is a designer file.</returns>
         public static bool IsDesignerFile(ProjectItemElement item) =>
-            item.Include.EndsWith(DesktopFacts.DesignerSuffix, StringComparison.OrdinalIgnoreCase);
+            item.Include.EndsWith(DesktopFacts.DesignerSuffix, StringComparison.OrdinalIgnoreCase)
+                || item.Include.EndsWith(DesktopFacts.DesignerSuffixVB, StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
         /// Checks if the given item is a resx file.

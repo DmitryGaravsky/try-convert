@@ -253,6 +253,7 @@ namespace MSBuild.Conversion.Facts
         public const string PlatformsPropertyName = "Platforms";
         public const string UseWinFormsPropertyName = "UseWindowsForms";
         public const string DesignerSuffix = ".Designer.cs";
+        public const string DesignerSuffixVB = ".Designer.vb";
         public const string XamlFileExtension = ".xaml";
         public const string SettingsDesignerFileName = "Settings.Designer.cs";
         public const string SettingsFileSuffix = ".settings";
