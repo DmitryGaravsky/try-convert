@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
@@ -17,6 +18,7 @@ namespace MSBuild.Conversion.Facts
         static Dictionary<string, Dictionary<string, string>> versionToReferences;
         public const string MajorVersion = ".v20.2";
         public const string PublicAndPrereleasePackageMaskSuffix = ".*-*";
+        const string DependenciesFileName = "DevExpress{0}.dpd";
         public static bool SkipNetwork(string packageName)
         {
             return IsDevExpress(packageName);
@@ -37,7 +39,17 @@ namespace MSBuild.Conversion.Facts
             Dictionary<string, string> versionedReferenceToPackage;
             if (!versionToReferences.TryGetValue(version, out versionedReferenceToPackage))
             {
-                versionedReferenceToPackage = CreateReferenceToPackage(version);
+                var dependenciesFileName = string.Format(DependenciesFileName, version);
+                if (File.Exists(dependenciesFileName))
+                {
+                    versionedReferenceToPackage = new Dictionary<string, string>(JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(dependenciesFileName)), StringComparer.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    versionedReferenceToPackage = CreateReferenceToPackage(version);
+                    var jsonDependencies = JsonSerializer.Serialize(versionedReferenceToPackage, new JsonSerializerOptions { WriteIndented = true });
+                    File.WriteAllText(dependenciesFileName, jsonDependencies);
+                }
                 versionToReferences[version] = versionedReferenceToPackage;
             }
             if (versionedReferenceToPackage.TryGetValue(referenceName, out packageName))
@@ -58,7 +70,7 @@ namespace MSBuild.Conversion.Facts
         }
         public static string GetPackageVersion(string includeString)
         {
-            if (!includeString.StartsWith(DevExpressPrefix, StringComparison.InvariantCultureIgnoreCase))
+            if (!includeString.StartsWith(DevExpressPrefix, StringComparison.OrdinalIgnoreCase))
                 return null;
             var version = DependenciesGenerator.GetVersion(includeString);
             if (version == null)
@@ -67,11 +79,11 @@ namespace MSBuild.Conversion.Facts
             return version + PublicAndPrereleasePackageMaskSuffix;
         }
         public static bool IsDevExpress(string name) {
-            return name.StartsWith(DevExpressPrefix, StringComparison.InvariantCultureIgnoreCase);
+            return name.StartsWith(DevExpressPrefix, StringComparison.OrdinalIgnoreCase);
         }
         public static bool IsDevExpressWpf(string name)
         {
-            return name.StartsWith(DevExpressXpfPrefix, StringComparison.InvariantCultureIgnoreCase);
+            return name.StartsWith(DevExpressXpfPrefix, StringComparison.OrdinalIgnoreCase);
         }
         static Dictionary<string, string> CreateReferenceToPackage(string version)
         {
