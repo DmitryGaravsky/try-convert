@@ -143,6 +143,7 @@ namespace MSBuild.Abstractions
             tfm.StartsWith(MSBuildFacts.NetstandardPrelude, StringComparison.OrdinalIgnoreCase)
             || tfm.StartsWith(MSBuildFacts.NetcoreappPrelude, StringComparison.OrdinalIgnoreCase)
             || tfm.StartsWith(MSBuildFacts.Net5, StringComparison.OrdinalIgnoreCase)
+            || tfm.StartsWith(MSBuildFacts.Net6, StringComparison.OrdinalIgnoreCase)
             || tfm.StartsWith(MSBuildFacts.LowestFrameworkVersionWithSystemValueTuple, StringComparison.OrdinalIgnoreCase);
 
         /// <summary>

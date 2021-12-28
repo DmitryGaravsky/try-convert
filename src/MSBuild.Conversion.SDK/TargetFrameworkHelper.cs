@@ -71,7 +71,7 @@ namespace MSBuild.Conversion.SDK
                 var tfm = doc.RootElement.GetProperty("baselines").GetProperty("app").GetProperty("defaultOverrides").GetProperty("Framework").GetString();
                 if (string.IsNullOrEmpty(tfm))
                 {
-                    return MSBuildFacts.Net5;
+                    return MSBuildFacts.Net6; // LTS
                 }
                 else
                 {

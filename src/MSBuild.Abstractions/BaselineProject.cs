@@ -31,6 +31,11 @@ namespace MSBuild.Abstractions
                 return MSBuildFacts.Net5Windows;
             }
 
+            if (candidateTargetTFM.ContainsIgnoreCase(MSBuildFacts.Net6) && projectStyle is ProjectStyle.WindowsDesktop)
+            {
+                return MSBuildFacts.Net6Windows;
+            }
+
             if (projectStyle is not ProjectStyle.MSTest && projectStyle is not ProjectStyle.Web && outputType is ProjectOutputType.Library)
             {
                 return MSBuildFacts.NetStandard20;

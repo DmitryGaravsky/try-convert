@@ -137,7 +137,7 @@ namespace MSBuild.Abstractions
                     break;
                 case ProjectStyle.WindowsDesktop:
                     rootElement.Sdk =
-                        tfm.ContainsIgnoreCase(MSBuildFacts.Net5)
+                        tfm.ContainsIgnoreCase(MSBuildFacts.Net5) || tfm.ContainsIgnoreCase(MSBuildFacts.Net6)
                             ? MSBuildFacts.DefaultSDKAttribute
                             : DesktopFacts.WinSDKAttribute; // pre-.NET 5 apps need a special SDK attribute.
                     break;
@@ -203,10 +203,12 @@ namespace MSBuild.Abstractions
                 propertiesInTheBaseline = propertiesInTheBaseline.Add(DesktopFacts.UseWPFPropertyName);
             }
 
-            tfm =
-                projectStyle == ProjectStyle.WindowsDesktop && tfm.ContainsIgnoreCase(MSBuildFacts.Net5)
-                    ? MSBuildFacts.Net5Windows
-                    : tfm;
+            if (projectStyle == ProjectStyle.WindowsDesktop) {
+                if (tfm.ContainsIgnoreCase(MSBuildFacts.Net5))
+                    tfm = MSBuildFacts.Net5Windows;
+                if (tfm.ContainsIgnoreCase(MSBuildFacts.Net6))
+                    tfm = MSBuildFacts.Net6Windows;
+            }
 
             baselineProject = new BaselineProject(newProject, propertiesInTheBaseline, projectStyle, outputType, tfm, keepCurrentTFMs);
             return true;
